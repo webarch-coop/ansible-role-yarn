@@ -4,21 +4,29 @@
     pkg: apt-transport-https
     state: latest
     update_cache: yes
+  tags:
+    - yarn
 
 - name: Yarn GPG key present
   apt_key:
     id: 1646B01B86E50310
     url: https://dl.yarnpkg.com/debian/pubkey.gpg
     state: present
+  tags:
+    - yarn
 
 - name: Yarn APT repo available
   apt_repository:
     filename: yarn
     repo: "deb https://dl.yarnpkg.com/debian/ stable main"
     state: present
+  tags:
+    - yarn
 
 - name: Yarn package present 
   apt:
     name: yarn
     state: present
     update_cache: no
+  tags:
+    - yarn
