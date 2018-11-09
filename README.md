@@ -26,7 +26,7 @@ roles_path = galaxy/roles
 To pull this repo in run:
 
 ```bash
-ansible-galaxy install -r requirements.yml --force -p galaxy/roles 
+ansible-galaxy install -r requirements.yml --force 
 ```
 
 The other repo should also contain a `yarn.yml` file that contains:
@@ -40,7 +40,7 @@ The other repo should also contain a `yarn.yml` file that contains:
     - stretch_servers
 
   roles:
-    - galaxy/roles/yarn
+    - yarn
 ```
 
 And a `hosts.yml` file that contains lists of servers, for example:
@@ -61,5 +61,5 @@ all:
 Then it can be run as follows:
 
 ```bash
-ansible-playbook yarn.yml -i hosts.yml
+ansible-playbook yarn.yml 
 ```
