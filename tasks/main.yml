@@ -23,7 +23,7 @@
   tags:
     - yarn
 
-- name: Yarn package present 
+- name: Yarn package present
   apt:
     name: yarn
     state: present
