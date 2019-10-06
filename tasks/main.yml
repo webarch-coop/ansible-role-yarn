@@ -1,9 +1,10 @@
 ---
 - name: apt-transport-https package present
   apt:
-    pkg: apt-transport-https
-    state: latest
-    update_cache: yes
+    pkg:
+      - apt-transport-https
+    state: present
+    update_cache: false
   tags:
     - yarn
 
@@ -25,9 +26,10 @@
 
 - name: Yarn package present
   apt:
-    name: yarn
+    pkg:
+      - yarn
     state: present
-    update_cache: no
+    update_cache: true
   tags:
     - yarn
 ...
