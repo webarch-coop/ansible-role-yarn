@@ -17,7 +17,7 @@
 
 - name: Yarn GPG key present
   apt_key:
-    file: /root/yarn.asc 
+    file: /root/yarn.asc
     state: present
   tags:
     - yarn
