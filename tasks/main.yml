@@ -17,7 +17,6 @@
 
 - name: Yarn GPG key present
   apt_key:
-    # id: 23E7166788B63E1E
     file: /root/yarn.asc 
     state: present
   tags:
