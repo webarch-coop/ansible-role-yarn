@@ -3,6 +3,7 @@
   apt:
     pkg:
       - apt-transport-https
+      - curl
     state: present
     update_cache: false
   tags:
@@ -24,12 +25,28 @@
   tags:
     - yarn
 
-- name: Yarn package present
-  apt:
-    pkg:
-      - yarn
-    state: present
-    update_cache: true
+- name: Install Yarn and update GPG key if this fails 
+  block:
+
+    - name: Yarn package present
+      apt:
+        pkg:
+          - yarn
+        state: present
+        update_cache: true
+
+  rescue:
+
+    - name: Manually update GPG key
+      shell: curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+
+    - name: Yarn package present
+      apt:
+        pkg:
+          - yarn
+        state: present
+        update_cache: true
+
   tags:
     - yarn
 ...
