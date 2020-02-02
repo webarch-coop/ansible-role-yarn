@@ -8,10 +8,17 @@
   tags:
     - yarn
 
+- name: Yarn GPG public key present
+  copy:
+    src: yarn.asc
+    dest: /root/yarn.asc
+  tags:
+    - yarn
+
 - name: Yarn GPG key present
   apt_key:
     id: 23E7166788B63E1E
-    file: yarn.asc 
+    file: /root/yarn.asc 
     state: present
   tags:
     - yarn
