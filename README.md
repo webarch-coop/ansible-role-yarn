@@ -1,6 +1,6 @@
 # Ansible Debian Yarn Role 
 
-This repository contains an Ansible role for [installing Yarn on Debian servers](https://yarnpkg.com/lang/en/docs/install/#linux-tab).
+This repository contains an Ansible role for installing [Yarn Classic](https://classic.yarnpkg.com/en/) on Debian servers using the `.deb` package.
 
 To use this role you need to use Ansible Galaxy to install it into another repository under `galaxy/roles/yarn` by adding a `requirements.yml` file in that repo that contains:
 
