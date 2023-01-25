@@ -104,6 +104,7 @@
           ansible.builtin.assert:
             that:
               - yarn_gpg_fingerprints[0] == yarn_gpg_fingerprints_found[0]
+            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
           when: ( ansible_local.gpg.version is version('2.2.12', '<') )
 
         - name: Yarn GPG key check all fingerprints
@@ -111,6 +112,7 @@
             that:
               - yarn_gpg_fingerprints_found | difference(yarn_gpg_fingerprints) | length == 0
               - yarn_gpg_fingerprints | difference(yarn_gpg_fingerprints_found) | length == 0
+            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
           when: ( ansible_local.gpg.version is version('2.2.12', '>=') )
 
       when: ( yarn_asc_file.stat.exists | bool )
