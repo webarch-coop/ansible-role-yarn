@@ -1,71 +1,25 @@
-# Ansible Debian Yarn Role 
+# Ansible Debian Yarn Classic Role
+
+[![pipeline status](https://git.coop/webarch/yarn/badges/master/pipeline.svg)](https://git.coop/webarch/yarn/-/commits/master)
 
 This repository contains an Ansible role for installing [Yarn Classic](https://classic.yarnpkg.com/en/) on Debian servers using the `.deb` package.
 
-To use this role you need to use Ansible Galaxy to install it into another repository under `galaxy/roles/yarn` by adding a `requirements.yml` file in that repo that contains:
+## Role variables
 
-```yml
----
-- name: yarn
-  src: https://git.coop/webarch/yarn.git
-  version: master
-  scm: git
-```
+See the [defaults/main.yml](defaults/main.yml) file for the default variables, the [vars/main.yml](vars/main.yml) file for the preset variables and the [meta/argument_specs.yml](meta/argument_specs.yml) file for the variable specification.
 
-And a `ansible.cfg` that contains:
+### yarn
 
-```
-[defaults]
-retry_files_enabled = False
-pipelining = True
-inventory = hosts.yml
-roles_path = galaxy/roles
+Set the `yarn` variable to `true` run the tasks in this role, it defaults to `false`.
 
-```
+## Repository
 
-And a `.gitignore` containing:
+The primary URL of this repo is [`https://git.coop/webarch/yarn`](https://git.coop/webarch/yarn) however it is also [mirrored to GitHub](https://github.com/webarch-coop/ansible-role-yarn) and [available via Ansible Galaxy](https://galaxy.ansible.com/chriscroome/yarn).
 
-```
-roles/galaxy
-```
+If you use this role please use a tagged release, see [the release notes](https://git.coop/webarch/yarn/-/releases).
 
-To pull this repo in run:
+## Copyright
 
-```bash
-ansible-galaxy install -r requirements.yml --force 
-```
+Copyright 2019-2023 Chris Croome, &lt;[chris@webarchitects.co.uk](mailto:chris@webarchitects.co.uk)&gt;.
 
-The other repo should also contain a `yarn.yml` file that contains:
-
-```yml
----
-- name: Install Yarn
-  become: yes
-
-  hosts:
-    - stretch_servers
-
-  roles:
-    - yarn
-```
-
-And a `hosts.yml` file that contains lists of servers, for example:
-
-```yml
----
-all:
-  children:
-    stretch_servers:
-      hosts:
-        host3.example.org:
-        host4.example.org:
-        cloud.example.com:
-        cloud.example.org:
-        cloud.example.net:
-```
-
-Then it can be run as follows:
-
-```bash
-ansible-playbook yarn.yml 
-```
+This role is released under [the same terms as Ansible itself](https://github.com/ansible/ansible/blob/devel/COPYING), the [GNU GPLv3](LICENSE).
