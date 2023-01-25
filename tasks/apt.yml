@@ -36,11 +36,8 @@
 
     - name: Legacy Yarn GPG public key absent
       ansible.builtin.apt_key:
-        id: "{{ yarn_gpg_id }}"
+        id: 72ECF46A56B4AD39C907BBB71646B01B86E50310
         state: absent
-      loop: "{{ yarn_gpg_fingerprints }}"
-      loop_control:
-        loop_var: yarn_gpg_id
 
     - name: Apt keyrings directory present
       ansible.builtin.file:
