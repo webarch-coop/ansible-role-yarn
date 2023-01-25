@@ -1,41 +1,48 @@
+# Copyright 2018-2023 Chris Croome
+#
+# This file is part of the Webarchitects Yarn Ansible role.
+#
+# The Webarchitects Yarn Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects Yarn Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects Yarn Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-- name: apt-transport-https package present
-  apt:
-    pkg:
-      - apt-transport-https
-    state: present
-    update_cache: false
-  tags:
-    - yarn
+- name: Install Yarn Classic
+  block:
 
-- name: Yarn GPG public key present
-  copy:
-    src: yarn.asc
-    dest: /root/yarn.asc
-  tags:
-    - yarn
+    - name: apt-transport-https package present
+      ansible.builtin.apt:
+        pkg:
+          - apt-transport-https
+        state: present
+        update_cache: false
 
-- name: Yarn GPG key present
-  apt_key:
-    file: /root/yarn.asc
-    state: present
-  tags:
-    - yarn
+    - name: Yarn GPG public key present
+      ansible.builtin.copy:
+        src: yarn.asc
+        dest: /root/yarn.asc
+        mode: 0600
 
-- name: Yarn APT repo available
-  apt_repository:
-    filename: yarn
-    repo: "deb https://dl.yarnpkg.com/debian/ stable main"
-    state: present
-  tags:
-    - yarn
+    - name: Yarn GPG key present
+      ansible.builtin.apt_key:
+        file: /root/yarn.asc
+        state: present
 
-- name: Yarn package present
-  apt:
-    pkg:
-      - yarn
-    state: present
-    update_cache: true
+    - name: Yarn APT repo available
+      ansible.builtin.apt_repository:
+        filename: yarn
+        repo: "deb https://dl.yarnpkg.com/debian/ stable main"
+        state: present
+
+    - name: Yarn package present
+      ansible.builtin.apt:
+        pkg:
+          - yarn
+        state: present
+        update_cache: true
+
+  when: yarn | bool
   tags:
     - yarn
 ...
