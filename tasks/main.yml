@@ -11,29 +11,97 @@
 - name: Install Yarn Classic
   block:
 
-    - name: apt-transport-https package present
-      ansible.builtin.apt:
-        pkg:
-          - apt-transport-https
-        state: present
-        update_cache: false
+    - name: Find legacy Yarn apt list files
+      ansible.builtin.find:
+        paths: /etc/apt/sources.list.d
+        patterns: "*onlyoffice*.list"
+      register: yarn_old_apt_list_files
 
-    - name: Yarn GPG public key present
-      ansible.builtin.copy:
-        src: yarn.asc
-        dest: /root/yarn.asc
-        mode: 0600
+    - name: List legacy Yarn apt list files to be disabled
+      ansible.builtin.debug:
+        msg: "apt list file {{ file.path }} to be moved to {{ file.path }}.ansible.save"
+      loop: "{{ yarn_old_apt_list_files.files }}"
+      loop_control:
+        loop_var: file
+        label: "{{ file.path | basename }}"
+      when: (yarn_old_apt_list_files.matched >= 1)
+
+    - name: Disable legacy Yarn apt list files
+      ansible.builtin.command: "mv {{ file.path }} {{ file.path }}.ansible.save"
+      loop: "{{ yarn_old_apt_list_files.files }}"
+      loop_control:
+        loop_var: file
+        label: "{{ file.path | basename }}"
+      when: (yarn_old_apt_list_files.matched >= 1)
+
+    - name: Legacy Yarn GPG public key absent
+      ansible.builtin.apt_key:
+        id: "{{ yarn_gpg_id }}"
+        state: absent
+      loop: "{{ yarn_gpg_fingerprints }}"
+      loop_control:
+        loop_var: yarn_gpg_id
+
+    - name: Apt keyrings directory present
+      ansible.builtin.file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: 0755
+        owner: root
+        group: root
 
     - name: Yarn GPG key present
-      ansible.builtin.apt_key:
-        file: /root/yarn.asc
-        state: present
+      ansible.builtin.get_url:
+        url: "{{ yarn_gpg_url }}"
+        checksum: "{{ yarn_gpg_checksum }}"
+        dest: /etc/apt/keyrings/yarn.gpg
+        mode: 0644
+        owner: root
+        group: root
 
-    - name: Yarn APT repo available
-      ansible.builtin.apt_repository:
-        filename: yarn
-        repo: "deb https://dl.yarnpkg.com/debian/ stable main"
-        state: present
+    - name: Stat the GPG key
+      ansible.builtin.stat:
+        path: /etc/apt/keyrings/yarn.gpg
+      register: yarn_gpg_file
+
+    - name: Check the GPG fingerprints when the public key is present
+      block:
+
+        - name: Yarn gpg key check command
+          ansible.builtin.command: gpg --with-colons --show-keys /etc/apt/keyrings/yarn.gpg
+          check_mode: false
+          changed_when: false
+          register: yarn_gpg
+
+        - name: Set a fact for the Yarn GPG fingerprints on the server
+          ansible.builtin.set_fact:
+            yarn_gpg_fingerprints_found: "{{ yarn_gpg.stdout | community.general.jc('gpg') | community.general.json_query('[?type==`fpr`].user_id') | list }}"
+
+        - name: Yarn gpg key check fingerprints
+          ansible.builtin.assert:
+            that:
+              - yarn_gpg_fingerprints_found | difference(yarn_gpg_fingerprints) | length == 0
+              - yarn_gpg_fingerprints | difference(yarn_gpg_fingerprints_found) | length == 0
+
+      when: ( yarn_gpg_file.stat.exists | bool )
+
+    - name: Yarn repository sources file present
+      ansible.builtin.template:
+        src: yarn.sources.j2
+        dest: /etc/apt/sources.list.d/yarn.sources
+        mode: 0644
+        owner: root
+        group: root
+      register: yarn_sources
+
+    - name: Yarn apt preferences present
+      ansible.builtin.template:
+        src: yarn.pref.j2
+        dest: /etc/apt/preferences.d/yarn.pref
+        mode: 0644
+        owner: root
+        group: root
+      register: yarn_preferences
 
     - name: Yarn package present
       ansible.builtin.apt:

@@ -1,0 +1,9 @@
+# {{ ansible_managed }}
+
+{% for pkg in php_debian_pkg %}
+Package: {{ pkg }}
+Pin: origin dl.yarnpkg.com
+Pin-Priority: 500
+
+{% endfor %}
+# vim: ft=debsources

@@ -1,0 +1,34 @@
+# Copyright 2018-2023 Chris Croome
+#
+# This file is part of the Webarchitects Yarn Ansible role.
+#
+# The Webarchitects Yarn Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects Yarn Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects Yarn Ansible role. If not, see <https://www.gnu.org/licenses/>.
+---
+# GPG public key URL linked from
+# https://classic.yarnpkg.com/en/docs/install#debian-stable
+yarn_gpg_url: https://dl.yarnpkg.com/debian/pubkey.gpg
+
+# GPG public key sha256sum
+# wget -q 'https://dl.yarnpkg.com/debian/pubkey.gpg' -O - | sha256sum - | awk '{ print $1 }' | sed 's/^/"sha256:/' | sed 's/$/"/'
+yarn_gpg_checksum: "sha256:8550a7e298b523fffa899069754fc150f2ff74092701e4d4109edd1cd6d5327f"
+
+# GPG fingerprints
+# wget -q 'https://dl.yarnpkg.com/debian/pubkey.gpg' -O - | gpg --dearmor | gpg --with-colons --show-keys - | grep ^fpr | sed 's/^fpr//' | sed 's/://g' | sed 's/^/  - /'
+yarn_gpg_fingerprints:
+  - 72ECF46A56B4AD39C907BBB71646B01B86E50310
+  - DE5786295D8C497E4D99124102820C39D50AF136
+  - 190A983E9AD398FC9F51216DD101F7899D41F3C3
+  - 6A010C5166006599AA17F08146C2130DFD2497F5
+  - E21930C4D0A4AA4618581F7AE074D16EB6FF4DE3
+  - DEE0F07B347CD8202105B20C23E7166788B63E1E
+  - 6D98490C6F1ACDDD448E45954F77679369475BAA
+
+# Debian packages
+# cat /var/lib/apt/lists/dl.yarnpkg.com_debian_dists_stable_main_binary-amd64_Packages | grep -e '^Package' | grep -ve '-dbgsym$' -e '-dbg$' -e '-dev$' | sed 's/^Package: /  - /' | sort -u
+php_debian_pkg:
+  - yarn
+...
