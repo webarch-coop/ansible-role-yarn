@@ -1,0 +1,141 @@
+# Copyright 2018-2023 Chris Croome
+#
+# This file is part of the Webarchitects Yarn Ansible role.
+#
+# The Webarchitects Yarn Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects Yarn Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects Yarn Ansible role. If not, see <https://www.gnu.org/licenses/>.
+---
+- name: Install Yarn Classic
+  block:
+
+    - name: Find legacy Yarn apt list files
+      ansible.builtin.find:
+        paths: /etc/apt/sources.list.d
+        patterns: "*yarn*.list"
+      register: yarn_old_apt_list_files
+
+    - name: List legacy Yarn apt list files to be disabled
+      ansible.builtin.debug:
+        msg: "apt list file {{ file.path }} to be moved to {{ file.path }}.ansible.save"
+      loop: "{{ yarn_old_apt_list_files.files }}"
+      loop_control:
+        loop_var: file
+        label: "{{ file.path | basename }}"
+      when: (yarn_old_apt_list_files.matched >= 1)
+
+    - name: Disable legacy Yarn apt list files
+      ansible.builtin.command: "mv {{ file.path }} {{ file.path }}.ansible.save"
+      loop: "{{ yarn_old_apt_list_files.files }}"
+      loop_control:
+        loop_var: file
+        label: "{{ file.path | basename }}"
+      when: (yarn_old_apt_list_files.matched >= 1)
+
+    - name: Legacy Yarn GPG public key absent
+      ansible.builtin.apt_key:
+        id: "{{ yarn_gpg_id }}"
+        state: absent
+      loop: "{{ yarn_gpg_fingerprints }}"
+      loop_control:
+        loop_var: yarn_gpg_id
+
+    - name: Apt keyrings directory present
+      ansible.builtin.file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: 0755
+        owner: root
+        group: root
+
+    - name: Yarn ASCII armored GPG key present
+      ansible.builtin.get_url:
+        url: "{{ yarn_gpg_url }}"
+        checksum: "{{ yarn_gpg_checksum }}"
+        dest: /root/yarn.asc
+        mode: 0644
+        owner: root
+        group: root
+
+    - name: Stat the Yarn ASCII armored GPG key
+      ansible.builtin.stat:
+        path: /root/yarn.asc
+      register: yarn_asc_file
+
+    - name: Check the GPG key when it exists
+      block:
+
+        - name: Stat Yarn GPG dearmored file
+          ansible.builtin.stat:
+            path: /etc/apt/keyrings/yarn.gpg
+          register: yarn_gpg_file
+
+        - name: Yarn GPG key dearmored
+          ansible.builtin.shell: |
+            set -e -o pipefail
+            gpg --dearmor < /root/yarn.asc > /etc/apt/keyrings/yarn.gpg
+          args:
+            executable: "{{ ansible_local.bash.path }}"
+          when: ( yarn_asc_file.changed | bool ) or ( not yarn_gpg_file.stat.exists | bool )
+
+        - name: Stat Yarn GPG dearmored file
+          ansible.builtin.stat:
+            path: /etc/apt/keyrings/yarn.gpg
+          register: yarn_gpg_file
+
+        - name: Yarn GPG key check command
+          ansible.builtin.command: >
+            gpg --with-colons
+            {% if ansible_local.gpg.version is version('2.2.12', '<') %}
+            --with-fingerprint --with-subkey-fingerprint
+            {% else %}
+            --show-keys
+            {% endif %}
+            /etc/apt/keyrings/yarn.gpg
+          when: ( yarn_gpg_file.stat.exists | bool )
+          check_mode: false
+          changed_when: false
+          register: yarn_gpg
+
+        - name: Set a fact for the Yarn GPG fingerprints on the server
+          ansible.builtin.set_fact:
+            yarn_gpg_fingerprints_found: "{{ yarn_gpg.stdout | community.general.jc('gpg') | community.general.json_query('[?type==`fpr`].user_id') | list }}"
+
+        - name: Yarn GPG key check only first fingerprint for GPG versions less that 2.2.12
+          ansible.builtin.assert:
+            that:
+              - yarn_gpg_fingerprints[0] == yarn_gpg_fingerprints_found[0]
+          when: ( ansible_local.gpg.version is version('2.2.12', '<') )
+
+        - name: Yarn GPG key check all fingerprints
+          ansible.builtin.assert:
+            that:
+              - yarn_gpg_fingerprints_found | difference(yarn_gpg_fingerprints) | length == 0
+              - yarn_gpg_fingerprints | difference(yarn_gpg_fingerprints_found) | length == 0
+          when: ( ansible_local.gpg.version is version('2.2.12', '>=') )
+
+      when: ( yarn_asc_file.stat.exists | bool )
+
+    - name: Yarn repository sources file present
+      ansible.builtin.template:
+        src: yarn.sources.j2
+        dest: /etc/apt/sources.list.d/yarn.sources
+        mode: 0644
+        owner: root
+        group: root
+      register: yarn_sources
+
+    - name: Yarn apt preferences present
+      ansible.builtin.template:
+        src: yarn.pref.j2
+        dest: /etc/apt/preferences.d/yarn.pref
+        mode: 0644
+        owner: root
+        group: root
+      register: yarn_preferences
+
+  tags:
+    - yarn
+...
