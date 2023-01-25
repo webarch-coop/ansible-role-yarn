@@ -14,7 +14,7 @@
     - name: Find legacy Yarn apt list files
       ansible.builtin.find:
         paths: /etc/apt/sources.list.d
-        patterns: "*onlyoffice*.list"
+        patterns: "*yarn*.list"
       register: yarn_old_apt_list_files
 
     - name: List legacy Yarn apt list files to be disabled
