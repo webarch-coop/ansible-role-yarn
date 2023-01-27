@@ -4,7 +4,7 @@
 
 This repository contains an Ansible role for installing [Yarn Classic](https://classic.yarnpkg.com/en/) on Debian servers using the `.deb` package.
 
-Running this role results in Yarn Calssic being installed:
+Running this role results in Yarn Classic being installed:
 
 ```bash
 /usr/bin/yarn --version
