@@ -8,6 +8,8 @@ This repository contains an Ansible role for installing [Yarn Classic](https://c
 
 See the [defaults/main.yml](defaults/main.yml) file for the default variables, the [vars/main.yml](vars/main.yml) file for the preset variables and the [meta/argument_specs.yml](meta/argument_specs.yml) file for the variable specification.
 
+The [Webarchitects apt role](https://git.coop/webarch/apt) is included by this role to set the `ansible_local.bash.path`, `ansible_local.dpkg.arch` and `ansible_local.gpg.version` variables.
+
 ### yarn
 
 Set the `yarn` variable to `true` run the tasks in this role, it defaults to `false`.
