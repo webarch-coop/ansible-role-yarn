@@ -8,7 +8,7 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects Yarn Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-- name: Install Yarn Classic
+- name: Configure Yarn Classic apt repo
   block:
 
     - name: Find legacy Yarn apt list files
