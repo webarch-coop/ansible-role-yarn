@@ -4,6 +4,15 @@
 
 This repository contains an Ansible role for installing [Yarn Classic](https://classic.yarnpkg.com/en/) on Debian servers using the `.deb` package.
 
+Running this role results in Yarn Calssic being installed:
+
+```bash
+/usr/bin/yarn --version
+3.2.4
+```
+
+See [issue #1](https://git.coop/webarch/yarn/-/issues/1) for plan to support the latest version of [Yarn](https://yarnpkg.com/) in the future.
+
 ## Role variables
 
 See the [defaults/main.yml](defaults/main.yml) file for the default variables, the [vars/main.yml](vars/main.yml) file for the preset variables and the [meta/argument_specs.yml](meta/argument_specs.yml) file for the variable specification.
