@@ -29,6 +29,6 @@ yarn_gpg_fingerprints:
 
 # Debian packages
 # cat /var/lib/apt/lists/dl.yarnpkg.com_debian_dists_stable_main_binary-amd64_Packages | grep -e '^Package' | grep -ve '-dbgsym$' -e '-dbg$' -e '-dev$' | sed 's/^Package: /  - /' | sort -u
-php_debian_pkg:
+yarn_debian_pkg:
   - yarn
 ...
