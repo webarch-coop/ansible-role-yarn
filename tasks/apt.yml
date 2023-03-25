@@ -69,7 +69,7 @@
             path: /etc/apt/keyrings/yarn.gpg
           register: yarn_gpg_file
 
-        - name: Yarn GPG key dearmored
+        - name: Yarn GPG key dearmored  # noqa: no-handler
           ansible.builtin.shell: |
             set -e -o pipefail
             gpg --dearmor < /root/yarn.asc > /etc/apt/keyrings/yarn.gpg
