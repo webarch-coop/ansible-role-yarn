@@ -3,7 +3,6 @@
 skip_list:
   - jinja[invalid]
   - key-order[task]
-  - schema[meta]
   - name[casing]
   - no-changed-when
 # vim: syntax=yaml
