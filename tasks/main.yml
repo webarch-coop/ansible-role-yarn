@@ -37,6 +37,18 @@
           ansible.builtin.debug:
             var: yarn_apt_cache
 
+        - name: Manually run apt-get update  # noqa command-instead-of-module
+          ansible.builtin.command: apt-get update
+          register: yarn_rescue_apt_get_update
+
+        - name: Debug the apt-get update results sent to standard out
+          ansible.builtin.debug:
+            var: yarn_rescue_apt_get_update.stdout_lines
+
+        - name: Debug the apt-get update results sent to standard error
+          ansible.builtin.debug:
+            var: yarn_rescue_apt_get_update.stderr_lines
+
         - name: Slurp a base64 encoded version of the yarn.sources file
           ansible.builtin.slurp:
             src: /etc/apt/sources.list.d/yarn.sources
@@ -75,9 +87,6 @@
         - name: Debug the stderr from running gpp against the yarn.gpg key
           ansible.builtin.debug:
             var: yarn_rescue_gpg_info.stderr_lines
-
-        - name: Manually run apt-get update  # noqa command-instead-of-module
-          ansible.builtin.command: apt-get update
 
         - name: Fail due to the failure of the yarn install
           ansible.builtin.fail:
