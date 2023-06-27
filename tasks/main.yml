@@ -76,6 +76,9 @@
           ansible.builtin.debug:
             var: yarn_rescue_gpg_info.stderr_lines
 
+        - name: Manually run apt-get update  # noqa command-instead-of-module
+          ansible.builtin.command: apt-get update
+
         - name: Fail due to the failure of the yarn install
           ansible.builtin.fail:
 
