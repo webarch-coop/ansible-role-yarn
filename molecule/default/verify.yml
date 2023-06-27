@@ -16,6 +16,19 @@
     - localhost
   tasks:
 
+    - name: Check the latest available version of Yarn
+      ansible.builtin.uri:
+        url: https://github.com/yarnpkg/yarn/releases/latest
+        method: HEAD
+        status_code: 302
+        follow_redirects: none
+      check_mode: false
+      register: molecule_yarn_headers
+
+    - name: Set a fact for the latest version of Yarn
+      ansible.builtin.set_fact:
+        molecule_yarn_latest: "{{ molecule_yarn_headers.location | urlsplit('path') | basename | regex_replace('^v') | string }}"
+
     - name: Which Yarn
       ansible.builtin.command: which yarn
       check_mode: false
@@ -24,5 +37,17 @@
 
     - name: Debug which yarn
       ansible.builtin.debug:
-        var: molecule_which_yarn
+        var: molecule_which_yarn.stdout
+
+    - name: Check installed Yarn version
+      ansible.builtin.command: yarn --version
+      check_mode: false
+      changed_when: false
+      register: molecule_yarn_version
+
+    - name: Check that the installed version of Yarn matches the latest version of Yarn
+      ansible.builtin.assert:
+        that:
+          - molecule_yarn_version.stdout == molecule_yarn_latest
+
 ...
