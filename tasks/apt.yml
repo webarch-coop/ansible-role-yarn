@@ -75,6 +75,7 @@
           ansible.builtin.shell: |
             set -e -o pipefail
             gpg --dearmor < /root/yarn.asc > /etc/apt/keyrings/yarn.gpg
+            chmod 644 /etc/apt/keyrings/yarn.gpg
           args:
             executable: "{{ ansible_local.bash.path }}"
           when: ( yarn_asc_file.changed | bool ) or ( not yarn_gpg_file.stat.exists | bool )
@@ -128,12 +129,6 @@
               - yarn_gpg_fingerprints | difference(yarn_gpg_fingerprints_found) | length == 0
             quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
           when: ( ansible_local.gpg.version is version('2.2.12', '>=') )
-
-        - name: Add apt signing key when init system is not systemd
-          ansible.builtin.apt_key:
-            file: /etc/apt/keyrings/yarn.gpg
-            state: present
-          when: yarn_init != "systemd"
 
       when: ( yarn_asc_file.stat.exists | bool )
 
