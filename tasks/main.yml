@@ -29,8 +29,13 @@
         - name: Update apt cache
           ansible.builtin.apt:
             update_cache: true
+          register: yarn_apt_cache
 
       rescue:
+
+        - name: Debug the apt cache update failure
+          ansible.builtin.debug:
+            var: yarn_apt_cache
 
         - name: Slurp a base64 encoded version of the yarn.sources file
           ansible.builtin.slurp:
