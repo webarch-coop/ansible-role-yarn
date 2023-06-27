@@ -23,12 +23,56 @@
     - name: Include apt tasks
       ansible.builtin.include_tasks: apt.yml
 
-    - name: Yarn package present
-      ansible.builtin.apt:
-        pkg:
-          - yarn
-        state: present
-        update_cache: true
+    - name: Install in a block to catch failures
+      block:
+
+        - name: Yarn package present
+          ansible.builtin.apt:
+            pkg:
+              - yarn
+            state: present
+            update_cache: true
+
+      rescue:
+
+        - name: Slurp a base64 encoded version of the yarn.sources file
+          ansible.builtin.slurp:
+            src: /etc/apt/sources.list.d/yarn.sources
+          register: yarn_rescue_sources_b64encoded
+
+        - name: Decode the base64 encoded version of the yarn.sources file and set a variable
+          ansible.builtin.set_fact:
+            yarn_rescue_sources_contents: "{{ yarn_rescue_sources_b64encoded['content'] | b64decode | trim }}"
+
+        - name: Debug the yarn.sources file
+          ansible.builtin.debug:
+            var: yarn_rescue_sources_contents
+
+        - name: Stat /etc/apt/keyrings/yarn.gpg
+          ansible.builtin.stat:
+            path: /etc/apt/keyrings/yarn.gpg
+            get_checksum: true
+            checksum_algorithm: sha256
+          register: yarn_rescue_gpg
+
+        - name: Debug the results from stating the yarn.gpg key
+          ansible.builtin.debug:
+            var: yarn_rescue_gpg.stat
+
+        - name: Check the GPG key
+          ansible.builtin.command: gpg -vv /etc/apt/keyrings/yarn.gpg
+          check_mode: false
+          changed_when: false
+          register: yarn_rescue_gpg_info
+          when: yarn_rescue_gpg.stat.exists | bool
+
+        - name: Debug the stdout from running gpp against the yarn.gpg key
+          ansible.builtin.debug:
+            var: yarn_rescue_gpg_info.stdout_lines
+
+        - name: Debug the stderr from running gpp against the yarn.gpg key
+          ansible.builtin.debug:
+            var: yarn_rescue_gpg_info.stderr_lines
 
   when: yarn | bool
   tags:

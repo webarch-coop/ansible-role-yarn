@@ -43,7 +43,7 @@
       ansible.builtin.file:
         path: /etc/apt/keyrings
         state: directory
-        mode: 0755
+        mode: "0755"
         owner: root
         group: root
 
@@ -52,7 +52,7 @@
         url: "{{ yarn_gpg_url }}"
         checksum: "{{ yarn_gpg_checksum }}"
         dest: /root/yarn.asc
-        mode: 0644
+        mode: "0644"
         owner: root
         group: root
 
@@ -121,7 +121,7 @@
       ansible.builtin.template:
         src: yarn.sources.j2
         dest: /etc/apt/sources.list.d/yarn.sources
-        mode: 0644
+        mode: "0644"
         owner: root
         group: root
       register: yarn_sources
@@ -130,7 +130,7 @@
       ansible.builtin.template:
         src: yarn.pref.j2
         dest: /etc/apt/preferences.d/yarn.pref
-        mode: 0644
+        mode: "0644"
         owner: root
         group: root
       register: yarn_preferences
