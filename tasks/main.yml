@@ -23,14 +23,11 @@
     - name: Include apt tasks
       ansible.builtin.include_tasks: apt.yml
 
-    - name: Install in a block to catch failures
+    - name: Update apt cache in a block to catch failures
       block:
 
-        - name: Yarn package present
+        - name: Update apt cache
           ansible.builtin.apt:
-            pkg:
-              - yarn
-            state: present
             update_cache: true
 
       rescue:
@@ -73,6 +70,16 @@
         - name: Debug the stderr from running gpp against the yarn.gpg key
           ansible.builtin.debug:
             var: yarn_rescue_gpg_info.stderr_lines
+
+        - name: Fail due to the failure of the yarn install
+          ansible.builtin.fail:
+
+    - name: Yarn package present
+      ansible.builtin.apt:
+        pkg:
+          - yarn
+        state: present
+        update_cache: true
 
   when: yarn | bool
   tags:
