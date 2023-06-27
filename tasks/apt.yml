@@ -27,6 +27,12 @@
         var: yarn_init
       when: yarn_init != "systemd"
 
+    - name: Update apt cache when the ini system is not systemd
+      ansible.builtin.apt:
+        update_cache: true
+      register: yarn_apt_cache
+      when: yarn_init != "systemd"
+
     - name: Find legacy Yarn apt list files
       ansible.builtin.find:
         paths: /etc/apt/sources.list.d
