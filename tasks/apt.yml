@@ -11,28 +11,6 @@
 - name: Configure Yarn Classic apt repo
   block:
 
-    # When in a docker container yarn_init.stdout == "sh"
-    - name: Check if system has been booted with systemd as init system
-      ansible.builtin.command: ps -p 1 -o comm=
-      changed_when: false
-      check_mode: false
-      register: yarn_ps
-
-    - name: Set a fact for the init system
-      ansible.builtin.set_fact:
-        yarn_init: "{{ yarn_ps.stdout }}"
-
-    - name: Debug the ini system when it is not systemd
-      ansible.builtin.debug:
-        var: yarn_init
-      when: yarn_init != "systemd"
-
-    - name: Update apt cache when the ini system is not systemd
-      ansible.builtin.apt:
-        update_cache: true
-      register: yarn_apt_cache
-      when: yarn_init != "systemd"
-
     - name: Find legacy Yarn apt list files
       ansible.builtin.find:
         paths: /etc/apt/sources.list.d
@@ -68,6 +46,7 @@
         mode: "0755"
         owner: root
         group: root
+      check_mode: false
 
     - name: Yarn ASCII armored GPG key present
       ansible.builtin.get_url:
@@ -77,6 +56,7 @@
         mode: "0644"
         owner: root
         group: root
+      check_mode: false
 
     - name: Stat the Yarn ASCII armored GPG key
       ansible.builtin.stat:
@@ -103,6 +83,10 @@
           ansible.builtin.stat:
             path: /etc/apt/keyrings/yarn.gpg
           register: yarn_gpg_file
+
+        - name: Debug the results from stating the Yarn GPG dearmored file
+          ansible.builtin.debug:
+            var: yarn_gpg_file
 
         - name: Yarn GPG key check command
           ansible.builtin.command: >
