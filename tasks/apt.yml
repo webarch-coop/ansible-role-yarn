@@ -96,6 +96,14 @@
           changed_when: false
           register: yarn_gpg
 
+        - name: Debug standard out from the GPG key check command
+          ansible.builtin.debug:
+            var: yarn_gpg.stdout_lines
+
+        - name: Debug standard error from the GPG key check command
+          ansible.builtin.debug:
+            var: yarn_gpg.stderr_lines
+
         - name: Set a fact for the Yarn GPG fingerprints on the server
           ansible.builtin.set_fact:
             yarn_gpg_fingerprints_found: "{{ yarn_gpg.stdout | community.general.jc('gpg') | community.general.json_query('[?type==`fpr`].user_id') | list }}"
