@@ -15,11 +15,11 @@
   hosts:
     - localhost
   tasks:
-  
+
     - name: Debug ansible_effective_user_id
       ansible.builtin.debug:
         var: ansible_effective_user_id
-  
+
     - name: Include yarn role as root
       ansible.builtin.include_role:
         name: yarn

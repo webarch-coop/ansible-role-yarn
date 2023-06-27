@@ -123,11 +123,11 @@
             quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
           when: ( ansible_local.gpg.version is version('2.2.12', '>=') )
 
-       - name: Import the Yarn GPG key
-         ansible.builtin.command: gpg --import /etc/apt/keyrings/yarn.gpg
-         check_mode: false
-         register: yarn_gpg_import
-         changed_when: ( "unchanged" not in yarn_gpg_import.stderr )
+        - name: Import the Yarn GPG key
+          ansible.builtin.command: gpg --import /etc/apt/keyrings/yarn.gpg
+          check_mode: false
+          register: yarn_gpg_import
+          changed_when: ( "unchanged" not in yarn_gpg_import.stderr )
 
       when: ( yarn_asc_file.stat.exists | bool )
 

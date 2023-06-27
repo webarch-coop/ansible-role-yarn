@@ -15,7 +15,7 @@
   hosts:
     - localhost
   tasks:
-  
+
     - name: Which Yarn
       ansible.builtin.command: which yarn
       check_mode: false
