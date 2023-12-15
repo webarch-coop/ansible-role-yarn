@@ -45,6 +45,10 @@
       changed_when: false
       register: molecule_yarn_version
 
+    - name: Debug Yarn version
+      ansible.builtin.debug:
+        var: molecule_yarn_version.stdout
+
     - name: Check that the installed version of Yarn matches the latest version of Yarn
       ansible.builtin.assert:
         that:
