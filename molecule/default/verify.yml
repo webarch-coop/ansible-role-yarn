@@ -64,8 +64,7 @@
     - name: Check that the installed version of Yarn matches the latest version of Yarn
       ansible.builtin.assert:
         that:
-          # the latest versions don't have .deb packages
-          # https://github.com/yarnpkg/yarn/releases
-          # - molecule_yarn_version.stdout == molecule_yarn_latest
-          - molecule_yarn_version.stdout == "1.22.19"
+          - molecule_yarn_version.stdout == molecule_yarn_latest
+        fail_msg: >-
+          The installed version of Yarn is {{ molecule_yarn_version.stdout }} and the latest version is {{ molecule_yarn_latest }}
 ...
