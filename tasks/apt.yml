@@ -77,7 +77,7 @@
             gpg --dearmor < /root/yarn.asc > /etc/apt/keyrings/yarn.gpg
             chmod 644 /etc/apt/keyrings/yarn.gpg
           args:
-            executable: "{{ ansible_local.bash.path }}"
+            executable: "{{ ansible_facts.ansible_local.bash.path }}"
           when: ( yarn_asc_file.changed | bool ) or ( not yarn_gpg_file.stat.exists | bool )
 
         - name: Stat Yarn GPG dearmored file
@@ -88,7 +88,7 @@
         - name: Yarn GPG key check command
           ansible.builtin.command: >
             gpg --with-colons
-            {% if ansible_local.gpg.version is version('2.2.12', '<') %}
+            {% if ansible_facts.ansible_local.gpg.version is version('2.2.12', '<') %}
             --with-fingerprint --with-subkey-fingerprint
             {% else %}
             --show-keys
@@ -108,7 +108,7 @@
             that:
               - yarn_gpg_fingerprints[0] == yarn_gpg_fingerprints_found[0]
             quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
-          when: ( ansible_local.gpg.version is version('2.2.12', '<') )
+          when: ( ansible_facts.ansible_local.gpg.version is version('2.2.12', '<') )
 
         - name: Yarn GPG key check all fingerprints
           ansible.builtin.assert:
@@ -116,7 +116,7 @@
               - yarn_gpg_fingerprints_found | difference(yarn_gpg_fingerprints) | length == 0
               - yarn_gpg_fingerprints | difference(yarn_gpg_fingerprints_found) | length == 0
             quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
-          when: ( ansible_local.gpg.version is version('2.2.12', '>=') )
+          when: ( ansible_facts.ansible_local.gpg.version is version('2.2.12', '>=') )
 
       when: ( yarn_asc_file.stat.exists | bool )
 
