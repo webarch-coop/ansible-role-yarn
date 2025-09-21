@@ -8,6 +8,8 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects Yarn Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
+ansible_managed: Ansible managed
+
 # GPG public key URL linked from
 # https://classic.yarnpkg.com/en/docs/install#debian-stable
 yarn_gpg_url: https://dl.yarnpkg.com/debian/pubkey.gpg
