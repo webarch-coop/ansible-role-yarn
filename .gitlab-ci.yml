@@ -34,8 +34,8 @@ before_script:
   - which molecule
   - molecule --version
 stages:
-  - trixie
   - bookworm
+  - trixie
   - forky
   - noble
 bookworm:
