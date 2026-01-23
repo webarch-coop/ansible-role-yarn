@@ -135,6 +135,17 @@
         group: root
       register: yarn_preferences
 
+    - name: Check if /usr/bin/apt-key is present
+      ansible.builtin.stat:
+        path: /usr/bin/apt-key
+      register: yarn_apt_key
+
+    - name: Legacy Yarn GPG public key absent when apt-key is present
+      ansible.builtin.apt_key:
+        id: 72ECF46A56B4AD39C907BBB71646B01B86E50310
+        state: absent
+      when: yarn_apt_key.stat.exists | bool
+
   tags:
     - yarn
 ...
