@@ -1,4 +1,4 @@
-# Copyright 2018-2025 Chris Croome
+# Copyright 2018-2026 Chris Croome
 #
 # This file is part of the Webarchitects Yarn Ansible role.
 #
@@ -16,7 +16,7 @@ yarn_gpg_url: https://dl.yarnpkg.com/debian/pubkey.gpg
 
 # GPG public key sha256sum
 # wget -q 'https://dl.yarnpkg.com/debian/pubkey.gpg' -O - | sha256sum - | awk '{ print $1 }' | sed 's/^/"sha256:/' | sed 's/$/"/'
-yarn_gpg_checksum: "sha256:8550a7e298b523fffa899069754fc150f2ff74092701e4d4109edd1cd6d5327f"
+yarn_gpg_checksum: "sha256:63edc60568db873b70db03a3c4dd062a16c6b3d6e3015eb748edc234e6a4facd"
 
 # GPG fingerprints
 # wget -q 'https://dl.yarnpkg.com/debian/pubkey.gpg' -O - | gpg --dearmor | gpg --with-colons --show-keys - | grep ^fpr | sed 's/^fpr//' | sed 's/://g' | sed 's/^/  - /'
