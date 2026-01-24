@@ -10,6 +10,10 @@
 ---
 ansible_managed: Ansible managed
 
+# https://docs.ansible.com/ansible/latest/playbook_guide/complex_data_manipulation.html
+yarnvarnames: "{{ q('varnames', '^yarn_') | sort }}"
+yarnhostvars: "{{ dict(yarnvarnames | list | zip(q('vars', *yarnvarnames))) }}"
+
 yarn_classic_apt_files:
  - /etc/apt/preferences.d/yarn.pref
  - /etc/apt/keyrings/yarn.gpg
