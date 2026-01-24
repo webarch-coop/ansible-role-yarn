@@ -16,11 +16,13 @@
     - localhost
   tasks:
 
-    - name: Check Linux distro version and package facts
+    - name: Gather distro facts
       ansible.builtin.setup:
         gather_subset:
           - distribution
-          - pkg_mgr
+
+    - name: Gather package facts
+      ansible.builtin.package_facts:
 
     - name: Debian Trixie and newer
       block:
