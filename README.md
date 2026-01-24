@@ -2,7 +2,9 @@
 
 [![pipeline status](https://git.coop/webarch/yarn/badges/master/pipeline.svg)](https://git.coop/webarch/yarn/-/commits/master)
 
-This repository contains an Ansible role for installing [Yarn Classic](https://classic.yarnpkg.com/en/) on Debian servers using the `.deb` package.
+This repository contains an Ansible role for installing [Yarn Classic](https://classic.yarnpkg.com/en/) on Debian Bookworm (12) and older using the `.deb` package.
+
+On Debian Trixie (13) and newer the Yarn Classic package is removed, use the [NodeJS role](https://git.coop/webarch/nodejs) to install corepack.
 
 ## Role variables
 

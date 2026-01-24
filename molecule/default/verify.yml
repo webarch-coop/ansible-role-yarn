@@ -16,55 +16,97 @@
     - localhost
   tasks:
 
-    - name: Check the latest available version of Yarn
-      ansible.builtin.uri:
-        url: https://github.com/yarnpkg/yarn/releases/latest
-        method: HEAD
-        status_code: 302
-        follow_redirects: none
-      check_mode: false
-      register: molecule_yarn_headers
+    - name: Check Linux distro version and package facts
+      ansible.builtin.setup:
+        gather_subset:
+          - distribution
+          - pkg_mgr
 
-    - name: Set a fact for the latest version of Yarn
-      ansible.builtin.set_fact:
-        molecule_yarn_latest: "{{ molecule_yarn_headers.location | urlsplit('path') | basename | regex_replace('^v') | string }}"
+    - name: Debian Trixie and newer
+      block:
 
-    - name: Debug the latest version of Yarn
-      ansible.builtin.debug:
-        var: molecule_yarn_latest
-        verbosity: "{% if ansible_check_mode | bool %}0{% else %}1{% endif %}"
+        - name: Stat /etc/apt/keyrings/yarn.gpg
+          ansible.builtin.stat:
+            path: /etc/apt/keyrings/yarn.gpg
+          register: molecule_yarn_gpg
 
-    - name: Which Yarn
-      ansible.builtin.command: which yarn
-      check_mode: false
-      changed_when: false
-      register: molecule_which_yarn
+        - name: Stat /etc/apt/sources.list.d/yarn.sources
+          ansible.builtin.stat:
+            path: /etc/apt/sources.list.d/yarn.sources
+          register: molecule_yarn_sources
 
-    - name: Debug which yarn
-      ansible.builtin.debug:
-        var: molecule_which_yarn.stdout
-        verbosity: "{% if ansible_check_mode | bool %}0{% else %}1{% endif %}"
+        - name: Check that that the yarn package, sources and GPG public keys are absent
+          ansible.builtin.assert:
+            that:
+              - ("yarn" not in ansible_facts.packages.keys())
+              - not molecule_yarn_gpg.stat.exists | bool
+              - not molecule_yarn_sources.stat.exists | bool
 
-    - name: Check installed Yarn version
-      ansible.builtin.command: yarn --version
-      check_mode: false
-      changed_when: false
-      register: molecule_yarn_version
+      when:
+        - ansible_facts.distribution == "Debian"
+        - ansible_facts.distribution_major_version > 12
 
-    - name: Debug Yarn version stdout
-      ansible.builtin.debug:
-        var: molecule_yarn_version.stdout
-        verbosity: "{% if ansible_check_mode | bool %}0{% else %}1{% endif %}"
+    - name: Debian Bookworm and older
+      block:
 
-    - name: Debug the installed version of Yarn
-      ansible.builtin.debug:
-        var: molecule_yarn_version
-        verbosity: "{% if ansible_check_mode | bool %}0{% else %}1{% endif %}"
+        - name: Check that yarn package is present
+          ansible.builtin.assert:
+            that:
+              - ("yarn" in ansible_facts.packages.keys())
 
-    - name: Check that the installed version of Yarn matches the latest version of Yarn
-      ansible.builtin.assert:
-        that:
-          - molecule_yarn_version.stdout == molecule_yarn_latest
-        fail_msg: >-
-          The installed version of Yarn is {{ molecule_yarn_version.stdout }} and the latest version is {{ molecule_yarn_latest }}
+        - name: Check the latest available version of Yarn
+          ansible.builtin.uri:
+            url: https://github.com/yarnpkg/yarn/releases/latest
+            method: HEAD
+            status_code: 302
+            follow_redirects: none
+          check_mode: false
+          register: molecule_yarn_headers
+
+        - name: Set a fact for the latest version of Yarn
+          ansible.builtin.set_fact:
+            molecule_yarn_latest: "{{ molecule_yarn_headers.location | urlsplit('path') | basename | regex_replace('^v') | string }}"
+
+        - name: Debug the latest version of Yarn
+          ansible.builtin.debug:
+            var: molecule_yarn_latest
+            verbosity: "{% if ansible_check_mode | bool %}0{% else %}1{% endif %}"
+
+        - name: Which Yarn
+          ansible.builtin.command: which yarn
+          check_mode: false
+          changed_when: false
+          register: molecule_which_yarn
+
+        - name: Debug which yarn
+          ansible.builtin.debug:
+            var: molecule_which_yarn.stdout
+            verbosity: "{% if ansible_check_mode | bool %}0{% else %}1{% endif %}"
+
+        - name: Check installed Yarn version
+          ansible.builtin.command: yarn --version
+          check_mode: false
+          changed_when: false
+          register: molecule_yarn_version
+
+        - name: Debug Yarn version stdout
+          ansible.builtin.debug:
+            var: molecule_yarn_version.stdout
+            verbosity: "{% if ansible_check_mode | bool %}0{% else %}1{% endif %}"
+
+        - name: Debug the installed version of Yarn
+          ansible.builtin.debug:
+            var: molecule_yarn_version
+            verbosity: "{% if ansible_check_mode | bool %}0{% else %}1{% endif %}"
+
+        - name: Check that the installed version of Yarn matches the latest version of Yarn
+          ansible.builtin.assert:
+            that:
+              - molecule_yarn_version.stdout == molecule_yarn_latest
+            fail_msg: >-
+              The installed version of Yarn is {{ molecule_yarn_version.stdout }} and the latest version is {{ molecule_yarn_latest }}
+
+      when:
+        - ansible_facts.distribution == "Debian"
+        - ansible_facts.distribution_major_version <= 12
 ...

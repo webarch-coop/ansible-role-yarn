@@ -8,7 +8,45 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects Yarn Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-- name: Install Yarn Classic
+- name: Check Linux distro version
+  ansible.builtin.setup:
+    gather_subset:
+      - distribution
+  tags:
+    - yarn
+
+- name: Remove Yarn Classic on Debian Trixie and newer
+  block:
+
+    - name: Yarn package absent
+      ansible.builtin.apt:
+        pkg:
+          - yarn
+        state: present
+
+    - name: Disable yarn.sources
+      ansible.builtin.command:
+        cmd: "mv /etc/apt/sources.list.d/yarn.sources /etc/apt/sources.list.d/.yarn.sources.ansible.save"
+        creates: /etc/apt/sources.list.d/.yarn.sources.ansible.save
+        removes: /etc/apt/sources.list.d/yarn.sources
+
+    - name: Delete Yarn GPG signatures
+      ansbile.builtin.file:
+        path: /etc/apt/keyrings/yarn.gpg
+        state: absent
+
+    - name: Yarn Classic absent
+      ansible.builtin.debug:
+        msg: "Please use the nodejs Ansible role to install corepack."
+
+  when:
+    - yarn | bool
+    - ansible_facts.distribution == "Debian"
+    - ansible_facts.distribution_major_version > 12
+  tags:
+    - yarn
+
+- name: Install Yarn Classic on Debian Bookworm
   block:
 
     - name: Include apt role local fact tasks if variables are not defined
@@ -30,7 +68,11 @@
         state: present
         update_cache: true
 
-  when: yarn | bool
+  when:
+    - yarn | bool
+    - ansible_facts.distribution == "Debian"
+    - ansible_facts.distribution_major_version <= 12
+
   tags:
     - yarn
 ...
