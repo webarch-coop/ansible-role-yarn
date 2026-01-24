@@ -41,4 +41,8 @@ argument_specs:
         elements: str
         required: true
         description: A list of packages for the Yarn Classic apt preferences.
+      yarn_verify:
+        type: bool
+        required: false
+        description: Verify the variables starting with yarn_.
 ...

@@ -9,4 +9,5 @@
 # You should have received a copy of the GNU General Public License along with the Webarchitects Yarn Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
 yarn: false
+yarn_verify: true
 ...

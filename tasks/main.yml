@@ -36,7 +36,7 @@
       ansible.builtin.debug:
         msg: >-
           The distribution is {{ ansible_facts.distribution }} and the distribution_version is {{ ansible_facts.distribution_version }}
-          (AKA ({{ ansible_facts.distribution_release }}), this is a variable of the type {{ ansible_facts.distribution_version | ansible.builtin.type_debug }}.
+          (AKA {{ ansible_facts.distribution_release }}), this is a variable of the type {{ ansible_facts.distribution_version | ansible.builtin.type_debug }}.
         verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}0{% else %}1{% endif %}"
       tags:
         - debug
@@ -50,6 +50,9 @@
 
     - name: Yarn include verify tasks
       ansible.builtin.include_tasks: verify.yml
+      when:
+        - yarn_verify is defined
+        - yarn_verify | bool
 
   when: yarn | ansible.builtin.bool
   tags:
