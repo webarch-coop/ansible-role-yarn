@@ -8,10 +8,25 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects Yarn Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-- name: Check Linux distro version
+- name: Gather distribution facts
   ansible.builtin.setup:
     gather_subset:
       - distribution
+  tags:
+    - yarn
+
+- name: Debug distribution facts
+  ansible.builtin.debug:
+    msg: "The distribution is {{ ansible_facts.distribution }} and the distribution_version is {{ ansible_facts.distribution_version }}, this is a variable of the type {{ ansible_facts.distribution_version | ansible.builtin.type_debug }}."
+    # verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}0{% else %}1{% endif %}"
+  tags:
+    - debug
+    - yarn
+
+- name: This role only supports Debian
+  ansible.builtin.fail:
+    msg: "The distribution is {{ ansible_facts.distribution_version }}, the distribution_file_variety is {{ ansible_facts.distribution_file_variety }} and the distribution_version is {{ ansible_facts.distribution_version }}."
+  when: ansible_facts.distribution != "Debian"
   tags:
     - yarn
 
@@ -49,7 +64,7 @@
   when:
     - yarn | bool
     - ansible_facts.distribution == "Debian"
-    - ansible_facts.distribution_version is ansible.builtin.version('13.0', '>=')
+    - ansible_facts.distribution_version | ansible.builtin.string is ansible.builtin.version('13.0', '>=')
   tags:
     - yarn
 
@@ -78,7 +93,7 @@
   when:
     - yarn | bool
     - ansible_facts.distribution == "Debian"
-    - ansible_facts.distribution_version is ansible.builtin.version('13.0', '<')
+    - ansible_facts.distribution_version | ansible.builtin.string is ansible.builtin.version('13.0', '<')
 
   tags:
     - yarn

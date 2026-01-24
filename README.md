@@ -1,4 +1,4 @@
-# Webarchitects Yarn Classic Ansible Role
+# Webarchitects Yarn Ansible Role
 
 [![pipeline status](https://git.coop/webarch/yarn/badges/master/pipeline.svg)](https://git.coop/webarch/yarn/-/commits/master)
 
