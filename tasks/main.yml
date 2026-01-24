@@ -42,7 +42,7 @@
   when:
     - yarn | bool
     - ansible_facts.distribution == "Debian"
-    - ansible_facts.distribution_major_version > 12
+    - ansible_facts.distribution_major_version is ansible.builtin.version('12', '>')
   tags:
     - yarn
 
@@ -71,7 +71,7 @@
   when:
     - yarn | bool
     - ansible_facts.distribution == "Debian"
-    - ansible_facts.distribution_major_version <= 12
+    - ansible_facts.distribution_major_version is ansible.builtin.version('12', '<=')
 
   tags:
     - yarn
