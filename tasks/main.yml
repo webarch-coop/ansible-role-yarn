@@ -12,15 +12,20 @@
   ansible.builtin.setup:
     gather_subset:
       - distribution
-      - distribution_major_version
-      - distribution_release
       - distribution_version
+      - distribution_release
+  tags:
+    - yarn
+
+- name: Debug
+  ansible.builtin.debug:
+    var: ansible_facts
   tags:
     - yarn
 
 - name: Debug distribution facts
   ansible.builtin.debug:
-    msg: "The distribution is {{ ansible_facts.distribution }} and the distribution_version is {{ ansible_facts.distribution_version }}, this is a variable of the type {{ ansible_facts.distribution_version | ansible.builtin.type_debug }}."
+    msg: "The distribution is {{ ansible_facts.distribution }} and the distribution_version is {{ ansible_facts.distribution_version }} AKA ({{ ansible_facts.distribution_release }}), this is a variable of the type {{ ansible_facts.distribution_version | ansible.builtin.type_debug }}."
     # verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}0{% else %}1{% endif %}"
   tags:
     - debug
@@ -28,7 +33,7 @@
 
 - name: This role only supports Debian
   ansible.builtin.fail:
-    msg: "The distribution is {{ ansible_facts.distribution_version }}, the distribution_file_variety is {{ ansible_facts.distribution_file_variety }} and the distribution_version is {{ ansible_facts.distribution_version }}."
+    msg: "The distribution is {{ ansible_facts.distribution }} and the distribution_version is {{ ansible_facts.distribution_version }}."
   when: ansible_facts.distribution != "Debian"
   tags:
     - yarn
@@ -67,7 +72,7 @@
   when:
     - yarn | bool
     - ansible_facts.distribution == "Debian"
-    - ansible_facts.distribution_version | ansible.builtin.string is ansible.builtin.version('13.0', '>=')
+    - ansible_facts.distribution_version is ansible.builtin.version('13.0', 'ge')
   tags:
     - yarn
 
@@ -96,7 +101,7 @@
   when:
     - yarn | bool
     - ansible_facts.distribution == "Debian"
-    - ansible_facts.distribution_version | ansible.builtin.string is ansible.builtin.version('13.0', '<')
+    - ansible_facts.distribution_version is ansible.builtin.version('13.0', 'lt')
 
   tags:
     - yarn
