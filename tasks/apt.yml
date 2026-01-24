@@ -74,7 +74,7 @@
                  gpg --dearmor < /root/yarn.asc > /etc/apt/keyrings/yarn.gpg
                  chmod 644 /etc/apt/keyrings/yarn.gpg
             executable: "{{ ansible_facts.ansible_local.bash.path }}"
-          when: ( yarn_asc_file.changed | bool ) or ( not yarn_gpg_file.stat.exists | bool )
+          when: ( yarn_asc_file.changed | ansible.builtin.bool ) or ( not yarn_gpg_file.stat.exists | ansible.builtin.bool )
 
         - name: Stat Yarn GPG dearmored file
           ansible.builtin.stat:
@@ -91,7 +91,7 @@
                  --show-keys
                  {% endif %}
                  /etc/apt/keyrings/yarn.gpg
-          when: ( yarn_gpg_file.stat.exists | bool )
+          when: ( yarn_gpg_file.stat.exists | ansible.builtin.bool )
           check_mode: false
           changed_when: false
           register: yarn_gpg
@@ -115,7 +115,7 @@
             quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
           when: ( ansible_facts.ansible_local.gpg.version is version('2.2.12', '>=') )
 
-      when: ( yarn_asc_file.stat.exists | bool )
+      when: ( yarn_asc_file.stat.exists | ansible.builtin.bool )
 
     - name: Yarn repository sources file present
       ansible.builtin.template:
@@ -144,7 +144,7 @@
       ansible.builtin.apt_key:
         id: 72ECF46A56B4AD39C907BBB71646B01B86E50310
         state: absent
-      when: yarn_apt_key.stat.exists | bool
+      when: yarn_apt_key.stat.exists | ansible.builtin.bool
 
   tags:
     - yarn

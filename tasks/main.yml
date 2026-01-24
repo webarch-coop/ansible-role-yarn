@@ -8,33 +8,47 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects Yarn Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-- name: Gather distribution facts
-  ansible.builtin.setup:
-    gather_subset:
-      - distribution
-      - distribution_version
-      - distribution_release
-  tags:
-    - yarn
-
-- name: Debug
+- name: Yarn role skipped
   ansible.builtin.debug:
-    var: ansible_facts
+    msg: "The tasks in the Yarn role are not being run since the yarn variable is not true."
+  when: not yarn | ansible.builtin.bool
   tags:
     - yarn
 
-- name: Debug distribution facts
-  ansible.builtin.debug:
-    msg: "The distribution is {{ ansible_facts.distribution }} and the distribution_version is {{ ansible_facts.distribution_version }} AKA ({{ ansible_facts.distribution_release }}), this is a variable of the type {{ ansible_facts.distribution_version | ansible.builtin.type_debug }}."
-    # verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}0{% else %}1{% endif %}"
-  tags:
-    - debug
-    - yarn
+- name: Yarn role setup
+  block:
 
-- name: This role only supports Debian
-  ansible.builtin.fail:
-    msg: "The distribution is {{ ansible_facts.distribution }} and the distribution_version is {{ ansible_facts.distribution_version }}."
-  when: ansible_facts.distribution != "Debian"
+    - name: Gather distribution facts
+      ansible.builtin.setup:
+        gather_subset:
+          - distribution
+          - distribution_version
+          - distribution_release
+
+    - name: Debug
+      ansible.builtin.debug:
+        var: ansible_facts
+        verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}1{% else %}2{% endif %}"
+      tags:
+        - debug
+
+    - name: Debug distribution facts
+      ansible.builtin.debug:
+        msg: >-
+          The distribution is {{ ansible_facts.distribution }} and the distribution_version is {{ ansible_facts.distribution_version }}
+          (AKA ({{ ansible_facts.distribution_release }}), this is a variable of the type {{ ansible_facts.distribution_version | ansible.builtin.type_debug }}.
+        verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}0{% else %}1{% endif %}"
+      tags:
+        - debug
+
+    - name: This role only supports Debian
+      ansible.builtin.fail:
+        msg: >-
+             The distribution is {{ ansible_facts.distribution }} and the distribution_version is {{ ansible_facts.distribution_version }}
+             and the distribution_release is {{ ansible_facts.distribution_release }}.
+      when: ansible_facts.distribution != "Debian"
+
+  when: yarn | ansible.builtin.bool
   tags:
     - yarn
 
@@ -70,9 +84,11 @@
         update_cache: true
 
   when:
-    - yarn | bool
+    - yarn | ansible.builtin.bool
     - ansible_facts.distribution == "Debian"
-    - ansible_facts.distribution_version is ansible.builtin.version('13.0', 'ge')
+    - >-
+      ((ansible_facts.distribution_version != "n/a") and (ansible_facts.distribution_version is ansible.builtin.version('13.0', 'ge'))) or
+      ((ansible_facts.distribution_version == "n/a") and (ansible_facts.distribution_release == "forky"))
   tags:
     - yarn
 
@@ -99,10 +115,10 @@
         update_cache: true
 
   when:
-    - yarn | bool
+    - yarn | ansible.builtin.bool
     - ansible_facts.distribution == "Debian"
-    - ansible_facts.distribution_version is ansible.builtin.version('13.0', 'lt')
-
+    - ansible_facts.distribution_version != "n/a"
+    - ansible_facts.distribution_version is ansible.builtin.version('13.0', 'lt'))) or
   tags:
     - yarn
 ...
