@@ -12,6 +12,9 @@
   ansible.builtin.setup:
     gather_subset:
       - distribution
+      - distribution_major_version
+      - distribution_release
+      - distribution_version
   tags:
     - yarn
 
