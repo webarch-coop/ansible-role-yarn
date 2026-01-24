@@ -37,9 +37,10 @@
             path: /etc/apt/sources.list.d/yarn.sources
           register: molecule_yarn_sources
 
-        - name: Check that that the yarn package, sources and GPG public keys are absent
+        - name: Check that Corepack is present and the Yarn package, sources and GPG public keys are absent
           ansible.builtin.assert:
             that:
+              - ("node-corepack" in ansible_facts.packages.keys())
               - ("yarn" not in ansible_facts.packages.keys())
               - not molecule_yarn_gpg.stat.exists | bool
               - not molecule_yarn_sources.stat.exists | bool

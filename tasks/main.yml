@@ -15,14 +15,14 @@
   tags:
     - yarn
 
-- name: Remove Yarn Classic on Debian Trixie and newer
+- name: Remove Yarn Classic and install corepack on Debian Trixie and newer
   block:
 
     - name: Yarn package absent
       ansible.builtin.apt:
         pkg:
           - yarn
-        state: present
+        state: absent
 
     - name: Disable yarn.sources
       ansible.builtin.command:
@@ -38,6 +38,13 @@
     - name: Yarn Classic absent
       ansible.builtin.debug:
         msg: "Please use the nodejs Ansible role to install corepack."
+
+    - name: Corepack package present
+      ansible.builtin.apt:
+        pkg:
+          - node-corepack
+        state: present
+        update_cache: true
 
   when:
     - yarn | bool

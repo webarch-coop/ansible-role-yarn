@@ -4,7 +4,9 @@
 
 This repository contains an Ansible role for installing [Yarn Classic](https://classic.yarnpkg.com/en/) on Debian Bookworm (12) and older using the `.deb` package.
 
-On Debian Trixie (13) and newer the Yarn Classic package is removed, use the [NodeJS role](https://git.coop/webarch/nodejs) to install corepack.
+On Debian Trixie (13) and newer the Yarn Classic package is removed and [node-corepack](https://packages.debian.org/trixie/node-corepack) is installed:
+
+> Corepack is a zero-runtime-dependency Node.js script that acts as a bridge between Node.js projects and the package managers they are intended to be used with during development. In practical terms, Corepack lets you use Yarn, npm, and pnpm without having to install them.
 
 ## Role variables
 
