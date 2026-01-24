@@ -31,7 +31,7 @@
         removes: /etc/apt/sources.list.d/yarn.sources
 
     - name: Delete Yarn GPG signatures
-      ansbile.builtin.file:
+      ansible.builtin.file:
         path: /etc/apt/keyrings/yarn.gpg
         state: absent
 
