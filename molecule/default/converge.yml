@@ -20,9 +20,14 @@
       ansible.builtin.debug:
         var: ansible_facts.effective_user_id
 
-    - name: Include yarn role as root
+    - name: Include Yarn role
       ansible.builtin.include_role:
         name: yarn
       vars:  # noqa var-naming[no-role-prefix]
         yarn: true
+
+    - name: Include Yarn role verify argument spec tasks
+      ansible.builtin.include_role:
+        name: yarn
+        tasks_from: verify.yml
 ...

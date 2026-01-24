@@ -11,11 +11,34 @@
 argument_specs:
   main:
     author: Chris Croome
-    description: An Ansible role for installing Yarn Classic.
+    description: An Ansible role for installing Yarn Classic or Corepack.
     short_description: The main entry point for the Ansible role.
     options:
       yarn:
         type: bool
         required: true
         description: Run the tasks in this role.
+      yarn_classic_apt_files:
+        type: list
+        elements: str
+        required: true
+        description: A list of files to remove on Debian Trixie or newer.
+      yarn_gpg_url:
+        type: str
+        required: true
+        description: The URL of the Yarn Classic GPG key file.
+      yarn_gpg_checksum:
+        type: str
+        required: true
+        description: The SHA256 checksum of the Yarn Classic GPG key file.
+      yarn_gpg_fingerprints:
+        type: list
+        elements: str
+        required: true
+        description: A list of Yarn Classic apt gpg fingerprints.
+      yarn_debian_pkg:
+        type: list
+        elements: str
+        required: true
+        description: A list of packages for the Yarn Classic apt preferences.
 ...
