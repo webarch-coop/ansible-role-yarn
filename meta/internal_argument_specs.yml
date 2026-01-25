@@ -19,9 +19,9 @@ argument_specs:
         required: false
         description: Results from running apt-cache show nodejs using the ansible.builtin.command module.
       yarn_apt_cache_show:
-        type: dict
+        type: list
         required: false
-        description: JC conversion of apt-cache show nodejs results.
+        description: Results from JC converting apt-cache show nodejs results into a list.
       yarn_apt_policy:
         type: dict
         required: false
