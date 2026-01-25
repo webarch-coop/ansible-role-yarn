@@ -50,8 +50,10 @@
       when:
         - ansible_facts.distribution == "Debian"
         - >-
-          ((ansible_facts.distribution_version != "n/a") and (ansible_facts.distribution_version is ansible.builtin.version('13.0', '>='))) or
-          ((ansible_facts.distribution_version == "n/a") and (ansible_facts.distribution_release is ansible.builtin.regex('^forky|sid$'))
+          ((ansible_facts.distribution_version != "n/a") and
+          (ansible_facts.distribution_version is ansible.builtin.version('13.0', '>='))) or
+          ((ansible_facts.distribution_version == "n/a") and
+          (ansible_facts.distribution_release is ansible.builtin.regex('^forky|sid$')))
 
     - name: Debian Bookworm and older
       block:
@@ -116,7 +118,8 @@
             that:
               - molecule_yarn_version.stdout == molecule_yarn_latest
             fail_msg: >-
-              The installed version of Yarn is {{ molecule_yarn_version.stdout }} and the latest version is {{ molecule_yarn_latest }}
+                      The installed version of Yarn is {{ molecule_yarn_version.stdout }} and the latest version is
+                      {{ molecule_yarn_latest }}.
 
       when:
         - ansible_facts.distribution == "Debian"
