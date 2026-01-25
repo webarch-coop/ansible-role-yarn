@@ -1,0 +1,76 @@
+# Copyright 2018-2026 Chris Croome
+#
+# This file is part of the Webarchitects Yarn Ansible role.
+#
+# The Webarchitects Yarn Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects Yarn Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects Yarn Ansible role. If not, see <https://www.gnu.org/licenses/>.
+---
+- name: Verify variables starting with yarn_
+  block:
+
+    - name: Debug yarnvarnames
+      ansible.builtin.debug:
+        var: yarnvarnames
+        verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}1{% else %}2{% endif %}"
+      tags:
+        - debug
+
+    - name: Debug yarnhostvars
+      ansible.builtin.debug:
+        var: yarnhostvars
+        verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}1{% else %}2{% endif %}"
+      tags:
+        - debug
+
+    - name: Debug lookup meta/argument_specs.yml
+      ansible.builtin.debug:
+        msg: "{{ lookup('ansible.builtin.file', 'meta/argument_specs.yml', errors='strict') }}"
+        verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}1{% else %}2{% endif %}"
+      tags:
+        - debug
+
+    - name: Debug lookup meta/argument_specs.yml type
+      ansible.builtin.debug:
+        msg: "{{ lookup('ansible.builtin.file', 'meta/argument_specs.yml', errors='strict') | ansible.builtin.type_debug }}"
+        verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}1{% else %}2{% endif %}"
+      tags:
+        - debug
+
+    - name: Debug lookup meta/internal_argument_specs.yml
+      ansible.builtin.debug:
+        msg: "{{ lookup('ansible.builtin.file', 'meta/internal_argument_specs.yml', errors='strict') }}"
+        verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}1{% else %}2{% endif %}"
+      tags:
+        - debug
+
+    - name: Debug lookup meta/internal_argument_specs.yml type
+      ansible.builtin.debug:
+        msg: "{{ lookup('ansible.builtin.file', 'meta/internal_argument_specs.yml', errors='strict') | ansible.builtin.type_debug }}"
+        verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}1{% else %}2{% endif %}"
+      tags:
+        - debug
+
+    - name: Set a fact for the argument spec and internal argument spec
+      ansible.builtin.set_fact:
+        yarn_argument_spec: "{{ yarn_argument_spec_lookup | ansible.builtin.from_yaml }}"
+        yarn_internal_argument_spec: "{{ yarn_internal_argument_spec_lookup | ansible.builtin.from_yaml }}"
+      vars:
+        yarn_argument_spec_lookup: "{{ lookup('ansible.builtin.file', 'meta/argument_specs.yml', errors='strict') }}"
+        yarn_internal_argument_spec_lookup: "{{ lookup('ansible.builtin.file', 'meta/internal_argument_specs.yml', errors='strict') }}"
+
+    - name: Set a fact for the combined argument spec and internal argument spec
+      ansible.builtin.set_fact:
+        yarn_combined_argument_spec: "{{ yarn_argument_spec | ansible.builtin.combine(yarn_internal_argument_spec, recursive=true) }}"
+
+    - name: Check yarn_ variables using the combined argument spec
+      ansible.builtin.validate_argument_spec:
+        argument_spec: "{{ yarn_combined_argument_spec['argument_specs']['main']['options'] }}"
+        provided_arguments: "{{ yarnhostvars }}"
+
+  when: yarn_verify | ansible.builtin.bool
+  tags:
+    - yarn
+...

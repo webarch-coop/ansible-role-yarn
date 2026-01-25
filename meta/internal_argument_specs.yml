@@ -1,0 +1,70 @@
+# Copyright 2018-2026 Chris Croome
+#
+# This file is part of the Webarchitects Yarn Ansible role.
+#
+# The Webarchitects Yarn Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects Yarn Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects Yarn Ansible role. If not, see <https://www.gnu.org/licenses/>.
+---
+argument_specs:
+  main:
+    author: Chris Croome
+    description: An Ansible role for installing Yarn Classic or Corepack.
+    short_description: The main entry point for the Ansible role.
+    options:
+      yarn_argument_spec:
+        type: dict
+        required: false
+        description: Internal variable for the argument spec.
+      yarn_argument_spec_lookup:
+        type: str
+        required: false
+        description: Internal variable for the results of a lookup for the argument spec.
+      yarn_combined_argument_spec:
+        type: dict
+        required: false
+        desciption: Internal variable for the combined argument spec.
+      yarn_internal_argument_spec:
+        type: dict
+        required: false
+        description: Internal variable for the internal argument spec.
+      yarn_internal_argument_spec_lookup:
+        type: str
+        required: false
+        description: Internal variable for the results of a lookup for the internal argument spec.
+      yarn_old_apt_list_files:
+        type: dict
+        required: false
+        description: Result from running the ansible.builtin.find module.
+      yarn_asc_file:
+        type: dict
+        required: false
+        description: Result from running the ansible.builtin.stat module.
+      yarn_gpg_file:
+        type: dict
+        required: false
+        description: Result from running the ansible.builtin.stat module.
+      yarn_gpg:
+        type: dict
+        required: false
+        description: Result from running the ansible.builtin.command module.
+      yarn_sources:
+        type: dict
+        required: false
+        description: Result from running the ansible.builtin.template module.
+      yarn_preferences:
+        type: dict
+        required: false
+        description: Result from running the ansible.builtin.template module.
+      yarn_apt_key:
+        type: dict
+        required: false
+        description: Result from running the ansible.builtin.stat module.
+      yarn_gpg_fingerprints_found:
+        type: list
+        elements: str
+        required: false
+        description: LIst of Yarn GPG fingerprints.
+...

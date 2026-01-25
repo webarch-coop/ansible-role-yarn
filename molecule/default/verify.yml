@@ -20,6 +20,8 @@
       ansible.builtin.setup:
         gather_subset:
           - distribution
+          - distribution_release
+          - distribution_version
 
     - name: Gather package facts
       ansible.builtin.package_facts:
@@ -42,12 +44,14 @@
             that:
               - ("node-corepack" in ansible_facts.packages.keys())
               - ("yarn" not in ansible_facts.packages.keys())
-              - not molecule_yarn_gpg.stat.exists | bool
-              - not molecule_yarn_sources.stat.exists | bool
+              - not molecule_yarn_gpg.stat.exists | ansible.builtin.bool
+              - not molecule_yarn_sources.stat.exists | ansible.builtin.bool
 
       when:
         - ansible_facts.distribution == "Debian"
-        - ansible_facts.distribution_major_version is ansible.builtin.version('12', '>')
+        - >-
+          ((ansible_facts.distribution_version != "n/a") and (ansible_facts.distribution_version is ansible.builtin.version('13.0', '>='))) or
+          ((ansible_facts.distribution_version == "n/a") and (ansible_facts.distribution_release is ansible.builtin.regex('^forky|sid$'))
 
     - name: Debian Bookworm and older
       block:
@@ -68,12 +72,17 @@
 
         - name: Set a fact for the latest version of Yarn
           ansible.builtin.set_fact:
-            molecule_yarn_latest: "{{ molecule_yarn_headers.location | urlsplit('path') | basename | regex_replace('^v') | string }}"
+            molecule_yarn_latest: >-
+                                  {{- molecule_yarn_headers.location
+                                  | ansible.builtin.urlsplit('path')
+                                  | ansible.builtin.basename
+                                  | ansible.builtin.regex_replace('^v')
+                                  | ansible.builtin.string -}}
 
         - name: Debug the latest version of Yarn
           ansible.builtin.debug:
             var: molecule_yarn_latest
-            verbosity: "{% if ansible_check_mode | bool %}0{% else %}1{% endif %}"
+            verbosity: "{% if ansible_check_mode | ansible.builtin.bool %}0{% else %}1{% endif %}"
 
         - name: Which Yarn
           ansible.builtin.command: which yarn
@@ -84,7 +93,7 @@
         - name: Debug which yarn
           ansible.builtin.debug:
             var: molecule_which_yarn.stdout
-            verbosity: "{% if ansible_check_mode | bool %}0{% else %}1{% endif %}"
+            verbosity: "{% if ansible_check_mode | ansible.builtin.bool %}0{% else %}1{% endif %}"
 
         - name: Check installed Yarn version
           ansible.builtin.command: yarn --version
@@ -95,12 +104,12 @@
         - name: Debug Yarn version stdout
           ansible.builtin.debug:
             var: molecule_yarn_version.stdout
-            verbosity: "{% if ansible_check_mode | bool %}0{% else %}1{% endif %}"
+            verbosity: "{% if ansible_check_mode | ansible.builtin.bool %}0{% else %}1{% endif %}"
 
         - name: Debug the installed version of Yarn
           ansible.builtin.debug:
             var: molecule_yarn_version
-            verbosity: "{% if ansible_check_mode | bool %}0{% else %}1{% endif %}"
+            verbosity: "{% if ansible_check_mode | ansible.builtin.bool %}0{% else %}1{% endif %}"
 
         - name: Check that the installed version of Yarn matches the latest version of Yarn
           ansible.builtin.assert:
@@ -111,5 +120,6 @@
 
       when:
         - ansible_facts.distribution == "Debian"
-        - ansible_facts.distribution_major_version is ansible.builtin.version('12', '<=')
+        - ansible_facts.distribution_version != "n/a"
+        - ansible_facts.distribution_version is ansible.builtin.version('13.0', '<')
 ...
