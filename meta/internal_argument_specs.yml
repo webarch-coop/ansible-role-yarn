@@ -14,6 +14,14 @@ argument_specs:
     description: An Ansible role for installing Yarn Classic or Corepack.
     short_description: The main entry point for the Ansible role.
     options:
+      yarn_apt_cache_show_nodejs:
+        type: dict
+        required: false
+        description: Results from running apt-cache show nodejs using the ansible.builtin.command module.
+      yarn_apt_cache_show:
+        type: dict
+        required: false
+        description: JC conversion of apt-cache show nodejs results.
       yarn_apt_policy:
         type: dict
         required: false

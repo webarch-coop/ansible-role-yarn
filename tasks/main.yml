@@ -80,6 +80,29 @@
           - yarn
         state: absent
 
+    - name: Run apt-cache show nodejs
+      ansible.builtin.command:
+        cmd: apt-cache show nodejs
+      check_mode: false
+      changed_when: false
+      register: yarn_apt_cache_show_nodejs
+
+    - name: Debug yarn_apt_cache_show_nodejs
+      ansible.builtin.debug:
+        var: yarn_apt_cache_show_nodejs
+      tags:
+        - debug
+
+    - name: Set a fact for the results of apt-cache show nodejs
+      ansible.builtin.set_fact:
+        yarn_apt_cache_show: "{{ yarn_apt_cache_show_nodejs.stdout | community.general.jc('apt_cache_show') }}"
+
+    - name: Debug yarn_apt_cache_show
+      ansible.builtin.debug:
+        var: yarn_apt_cache_show
+      tags:
+        - debug
+
     - name: Delete Yarn apt sources, preferences and GPG signatures
       ansible.builtin.file:
         path: "{{ yarn_classic_apt_file }}"
