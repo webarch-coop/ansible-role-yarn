@@ -22,10 +22,6 @@ argument_specs:
         type: list
         required: false
         description: Results from JC converting apt-cache show nodejs results into a list.
-      yarn_apt_policy:
-        type: dict
-        required: false
-        description: Results from running apt policy nodejs using the ansible.builtin.command module.
       yarn_argument_spec:
         type: dict
         required: false

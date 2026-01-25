@@ -16,5 +16,5 @@
 - name: nodejs
   scm: git
   src: https://git.coop/webarch/nodejs.git
-  version: 3.5.1  # nodejs
+  version: 4.0.1  # nodejs
 ...

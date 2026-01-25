@@ -61,19 +61,6 @@
 - name: Remove Yarn Classic and install corepack on Debian Trixie and newer
   block:
 
-    - name: Run apt policy nodejs
-      ansible.builtin.command:
-        cmd: apt policy nodejs
-      check_mode: false
-      changed_when: false
-      register: yarn_apt_policy
-
-    - name: Debug yarn_apt_policy
-      ansible.builtin.debug:
-        var: yarn_apt_policy
-      tags:
-        - debug
-
     - name: Yarn package absent
       ansible.builtin.apt:
         pkg:
@@ -90,6 +77,7 @@
     - name: Debug yarn_apt_cache_show_nodejs
       ansible.builtin.debug:
         var: yarn_apt_cache_show_nodejs
+        verbosity: "{% if (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool) %}2{% else %}3{% endif %}"
       tags:
         - debug
 
@@ -100,8 +88,15 @@
     - name: Debug yarn_apt_cache_show
       ansible.builtin.debug:
         var: yarn_apt_cache_show
+        verbosity: "{% if (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool) %}1{% else %}2{% endif %}"
       tags:
         - debug
+
+    - name: The Debian node-corepack package depends on the nodejs package, it is not compatiable with the nodesource package
+      ansible.builtin.assert:
+        that:
+          - yarn_apt_cache_show[0].maintainer != yarn_maintainer.nodesource
+      when: yarn_apt_cache_show[0].maintainer is defined
 
     - name: Delete Yarn apt sources, preferences and GPG signatures
       ansible.builtin.file:
