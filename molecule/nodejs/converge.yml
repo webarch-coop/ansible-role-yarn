@@ -8,13 +8,32 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects Yarn Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-- name: apt
-  src: https://git.coop/webarch/apt.git
-  version: 4.12.1  # apt
-  scm: git
+- name: Run as root
+  # become: true
+  connection: local
+  # gather_facts: true
+  hosts:
+    - localhost
+  tasks:
 
-- name: nodejs
-  scm: git
-  src: https://git.coop/webarch/nodejs.git
-  version: 3.5.1  # nodejs
+    - name: Debug ansible_facts.effective_user_id
+      ansible.builtin.debug:
+        var: ansible_facts.effective_user_id
+
+    - name: Include nodejs role
+      ansible.builtin.include_role:
+        name: nodejs
+      vars:  # noqa var-naming[no-role-prefix]
+        nodejs: true
+
+    - name: Include Yarn role
+      ansible.builtin.include_role:
+        name: yarn
+      vars:  # noqa var-naming[no-role-prefix]
+        yarn: true
+
+    - name: Include Yarn role verify argument spec tasks
+      ansible.builtin.include_role:
+        name: yarn
+        tasks_from: verify.yml
 ...
