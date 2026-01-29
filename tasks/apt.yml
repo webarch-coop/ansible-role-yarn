@@ -68,6 +68,10 @@
             checksum_algorithm: sha256
           register: yarn_gpg_file
 
+        - name: Debug yarn_gpg_file.stat
+          ansible.builtin.debug:
+            var: yarn_gpg_file.stat
+
         - name: Yarn GPG key dearmored and sha256 checksum checked  # noqa: no-handler
           ansible.builtin.shell:
             cmd: |-
