@@ -71,7 +71,7 @@
         - name: Debug yarn_gpg_file.stat
           ansible.builtin.debug:
             var: yarn_gpg_file.stat
-            verbosity: "{% if (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool) %}0{% else %}1{% endif %}"
+            verbosity: "{% if (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool) %}1{% else %}2{% endif %}"
           tags:
             - debug
 

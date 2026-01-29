@@ -28,7 +28,7 @@
     - name: Debug
       ansible.builtin.debug:
         var: ansible_facts
-        verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}1{% else %}2{% endif %}"
+        verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}2{% else %}3{% endif %}"
       tags:
         - debug
 
@@ -155,6 +155,7 @@
     - name: Debug yarn_apt_cache_show_nodejs
       ansible.builtin.debug:
         var: yarn_apt_cache_show_nodejs
+        verbosity: "{% if (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool) %}2{% else %}3{% endif %}"
       tags:
         - debug
 
@@ -165,6 +166,7 @@
     - name: Debug yarn_apt_cache_show
       ansible.builtin.debug:
         var: yarn_apt_cache_show
+        verbosity: "{% if (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool) %}2{% else %}3{% endif %}"
       tags:
         - debug
 
