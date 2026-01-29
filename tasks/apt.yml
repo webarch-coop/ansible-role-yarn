@@ -71,6 +71,9 @@
         - name: Debug yarn_gpg_file.stat
           ansible.builtin.debug:
             var: yarn_gpg_file.stat
+            verbosity: "{% if (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool) %}0{% else %}1{% endif %}"
+          tags:
+            - debug
 
         - name: Yarn GPG key dearmored and sha256 checksum checked  # noqa: no-handler
           ansible.builtin.shell:
@@ -80,7 +83,11 @@
                  chmod 644 /etc/apt/keyrings/yarn.gpg
                  sha256sum /etc/apt/keyrings/yarn.gpg | awk '{ print $1 }'
             executable: "{{ ansible_facts.ansible_local.bash.path }}"
-          when: yarn_gpg_file.stat.checksum != yarn_gpg_dearmored_checksum
+          when: >-
+                (not yarn_gpg_file.stat.exists | ansible.builtin.bool) or
+                ((yarn_gpg_file.stat.checksum is defined) and
+                (yarn_gpg_file.stat.checksum != yarn_gpg_dearmored_checksum))
+          changed_when: true
           register: yarn_gpg_file_dearmored
           failed_when: yarn_gpg_file_dearmored.stdout != yarn_gpg_dearmored_checksum
 
