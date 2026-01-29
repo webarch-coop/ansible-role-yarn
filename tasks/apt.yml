@@ -47,7 +47,7 @@
     - name: Yarn ASCII armored GPG key present
       ansible.builtin.get_url:
         url: "{{ yarn_gpg_url }}"
-        checksum: "{{ yarn_gpg_checksum }}"
+        checksum: "sha256:{{ yarn_gpg_checksum }}"
         dest: /root/yarn.asc
         mode: "0644"
         owner: root
@@ -65,16 +65,20 @@
         - name: Stat Yarn GPG dearmored file
           ansible.builtin.stat:
             path: /etc/apt/keyrings/yarn.gpg
+            checksum_algorithm: sha256
           register: yarn_gpg_file
 
-        - name: Yarn GPG key dearmored  # noqa: no-handler
+        - name: Yarn GPG key dearmored and sha256 checksum checked  # noqa: no-handler
           ansible.builtin.shell:
             cmd: |-
                  set -e -o pipefail
                  gpg --dearmor < /root/yarn.asc > /etc/apt/keyrings/yarn.gpg
                  chmod 644 /etc/apt/keyrings/yarn.gpg
+                 sha256sum /etc/apt/keyrings/yarn.gpg | awk '{ print $1 }'
             executable: "{{ ansible_facts.ansible_local.bash.path }}"
-          when: ( yarn_asc_file.changed | ansible.builtin.bool ) or ( not yarn_gpg_file.stat.exists | ansible.builtin.bool )
+          when: yarn_gpg_file.stat.checksum != yarn_gpg_dearmored_checksum
+          register: yarn_gpg_file_dearmored
+          failed_when: yarn_gpg_file_dearmored.stdout != yarn_gpg_dearmored_checksum
 
         - name: Stat Yarn GPG dearmored file
           ansible.builtin.stat:
@@ -98,7 +102,7 @@
 
         - name: Set a fact for the Yarn GPG fingerprints on the server
           ansible.builtin.set_fact:
-            yarn_gpg_fingerprints_found: "{{ yarn_gpg.stdout | community.general.jc('gpg') | community.general.json_query('[?type==`fpr`].user_id') | list }}"
+            yarn_gpg_fingerprints_found: "{{ yarn_gpg.stdout | community.general.jc('gpg') | community.general.json_query('[?type==`fpr`].user_id') | list | sort }}"
 
         - name: Yarn GPG key check only first fingerprint for GPG versions less that 2.2.12
           ansible.builtin.assert:

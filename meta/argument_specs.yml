@@ -31,6 +31,10 @@ argument_specs:
         type: str
         required: true
         description: The SHA256 checksum of the Yarn Classic GPG key file.
+      yarn_gpg_dearmored_checksum:
+        type: str
+        required: true
+        description: The SHA256 checksum of the Yarn Classic dearmored GPG key file.
       yarn_gpg_fingerprints:
         type: list
         elements: str

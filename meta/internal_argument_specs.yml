@@ -54,6 +54,10 @@ argument_specs:
         type: dict
         required: false
         description: Result from running the ansible.builtin.stat module.
+      yarn_gpg_file_dearmored:
+        type: dict
+        required: false
+        description: Result from running the ansible.builtin.shell module.
       yarn_gpg:
         type: dict
         required: false

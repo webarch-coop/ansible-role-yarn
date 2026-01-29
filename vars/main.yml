@@ -28,8 +28,10 @@ yarn_classic_apt_files:
 yarn_gpg_url: https://dl.yarnpkg.com/debian/pubkey.gpg
 
 # GPG public key sha256sum
-# wget -q 'https://dl.yarnpkg.com/debian/pubkey.gpg' -O - | sha256sum - | awk '{ print $1 }' | sed 's/^/"sha256:/' | sed 's/$/"/'
-yarn_gpg_checksum: "sha256:f8f78154312934e7894e29da119c9fb06b489d36e0b36ec1538a5b8486a2f59e"
+# wget -q 'https://dl.yarnpkg.com/debian/pubkey.gpg' -O - | sha256sum - | awk '{ print $1 }' | sed 's/^/"/' | sed 's/$/"/'
+yarn_gpg_checksum: "f8f78154312934e7894e29da119c9fb06b489d36e0b36ec1538a5b8486a2f59e"
+# wget -q 'https://dl.yarnpkg.com/debian/pubkey.gpg' -O - | gpg --dearmor | sha256sum - | awk '{ print $1 }' | sed 's/^/"/' | sed 's/$/"/'
+yarn_gpg_dearmored_checksum: "dadf6038e7ae295233988aadfd9c951a9ace2ce81eec6b26a460453f3e6e2e10"
 
 # GPG fingerprints
 # wget -q 'https://dl.yarnpkg.com/debian/pubkey.gpg' -O - | gpg --dearmor | gpg --with-colons --show-keys - | grep ^fpr | sed 's/^fpr//' | sed 's/://g' | sed 's/^/  - /' | sort
