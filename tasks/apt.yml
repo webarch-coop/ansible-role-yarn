@@ -113,7 +113,10 @@
 
         - name: Set a fact for the Yarn GPG fingerprints on the server
           ansible.builtin.set_fact:
-            yarn_gpg_fingerprints_found: "{{ yarn_gpg.stdout | community.general.jc('gpg') | community.general.json_query('[?type==`fpr`].user_id') | list | sort }}"
+            yarn_gpg_fingerprints_found: >-
+              {{ yarn_gpg.stdout | community.general.jc('gpg') |
+              community.general.json_query('[?type==`fpr`].user_id') |
+              ansible.builtin.list | ansible.builtin.sort }}
 
         - name: Yarn GPG key check only first fingerprint for GPG versions less that 2.2.12
           ansible.builtin.assert:
